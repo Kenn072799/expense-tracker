@@ -7,6 +7,7 @@ The application allows users to securely manage their personal expenses, organiz
 ## Features
 
 ### Authentication
+
 - User registration
 - User login
 - JWT authentication
@@ -15,6 +16,7 @@ The application allows users to securely manage their personal expenses, organiz
 - Logout
 
 ### Expense Management
+
 - Create expenses
 - View expenses
 - Edit expenses
@@ -25,6 +27,7 @@ The application allows users to securely manage their personal expenses, organiz
 - Pagination
 
 ### Dashboard
+
 - Total expenses
 - Current month expenses
 - Total transaction count
@@ -34,6 +37,7 @@ The application allows users to securely manage their personal expenses, organiz
 ## Tech Stack
 
 ### Frontend
+
 - React
 - TypeScript
 - Vite
@@ -43,6 +47,7 @@ The application allows users to securely manage their personal expenses, organiz
 - Recharts
 
 ### Backend
+
 - ASP.NET Core Web API
 - C#
 - Entity Framework Core
@@ -51,9 +56,11 @@ The application allows users to securely manage their personal expenses, organiz
 - Rate Limiting
 
 ### Database
+
 - SQL Server
 
 ### Testing
+
 - xUnit
 - Moq
 
@@ -69,6 +76,7 @@ ExpenseTracker.Application
 ExpenseTracker.Domain
         ↑
 ExpenseTracker.Infrastructure
+```
 
 ## Screenshots
 
