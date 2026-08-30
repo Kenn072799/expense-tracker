@@ -69,3 +69,17 @@ ExpenseTracker.Application
 ExpenseTracker.Domain
         ↑
 ExpenseTracker.Infrastructure
+
+## Screenshots
+
+### Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+### Expenses
+
+![Expenses](screenshots/expenses.png)
+
+### Login
+
+![Login](screenshots/login.png)
