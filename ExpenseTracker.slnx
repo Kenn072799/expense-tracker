@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="ExpenseTracker.Api/ExpenseTracker.Api.csproj" />
+  <Project Path="ExpenseTracker.Application/ExpenseTracker.Application.csproj" />
+  <Project Path="ExpenseTracker.Domain/ExpenseTracker.Domain.csproj" />
+  <Project Path="ExpenseTracker.Infrastructure/ExpenseTracker.Infrastructure.csproj" />
+  <Project Path="ExpenseTracker.Tests/ExpenseTracker.Tests.csproj" Id="9a136b25-27e8-42b9-b2f4-18d188011718" />
+</Solution>
