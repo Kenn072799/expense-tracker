@@ -12,6 +12,7 @@ import type {
   UpdateBudgetRequest,
 } from "../types/budget";
 import type { CategoryResponse } from "../types/category";
+import Navbar from "../components/Navbar";
 
 export default function BudgetsPage() {
   const today = new Date();
@@ -36,39 +37,39 @@ export default function BudgetsPage() {
   const [error, setError] = useState("");
   const [createError, setCreateError] = useState("");
 
-const refreshBudgets = async () => {
-  const data = await getBudgets(month, year);
-  setBudgets(data);
-};
-
-useEffect(() => {
-  let cancelled = false;
-
-  const loadBudgets = async () => {
-    try {
-      const data = await getBudgets(month, year);
-
-      if (!cancelled) {
-        setBudgets(data);
-        setError("");
-      }
-    } catch {
-      if (!cancelled) {
-        setError("Failed to load budgets.");
-      }
-    } finally {
-      if (!cancelled) {
-        setLoading(false);
-      }
-    }
+  const refreshBudgets = async () => {
+    const data = await getBudgets(month, year);
+    setBudgets(data);
   };
 
-  loadBudgets();
+  useEffect(() => {
+    let cancelled = false;
 
-  return () => {
-    cancelled = true;
-  };
-}, [month, year]);
+    const loadBudgets = async () => {
+      try {
+        const data = await getBudgets(month, year);
+
+        if (!cancelled) {
+          setBudgets(data);
+          setError("");
+        }
+      } catch {
+        if (!cancelled) {
+          setError("Failed to load budgets.");
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadBudgets();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [month, year]);
 
   useEffect(() => {
     const loadCategories = async () => {
@@ -186,6 +187,7 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      <Navbar />
       <div className="mx-auto max-w-6xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Monthly Budgets</h1>
