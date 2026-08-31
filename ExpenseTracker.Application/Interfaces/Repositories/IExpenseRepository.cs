@@ -22,4 +22,9 @@ public interface IExpenseRepository
         ExpenseFilterRequest filter);
 
     Task<IEnumerable<Expense>> GetAllForDashboardAsync(int userId);
+
+    Task<IEnumerable<Expense>> GetByMonthAsync(
+        int userId,
+        int month,
+        int year);
 }

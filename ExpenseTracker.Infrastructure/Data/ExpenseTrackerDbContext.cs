@@ -12,6 +12,7 @@ public class ExpenseTrackerDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Expense> Expenses { get; set; }
     public DbSet<Category> Categories { get; set; }
+    public DbSet<Budget> Budgets { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -90,8 +91,41 @@ public class ExpenseTrackerDbContext : DbContext
                 .HasForeignKey(x => x.UserId);
 
             entity.HasOne(x => x.Category)
-                .WithMany()
+                .WithMany(x => x.Expenses)
                 .HasForeignKey(x => x.CategoryId);
+        });
+
+        modelBuilder.Entity<Budget>(entity =>
+        {
+            entity.ToTable("Budget");
+
+            entity.HasKey(x => x.BudgetId);
+
+            entity.Property(x => x.Amount)
+                .HasColumnType("decimal(18,2)");
+
+            entity.Property(x => x.CreatedAt)
+                .HasDefaultValueSql("SYSDATETIME()");
+
+            entity.Property(x => x.UpdatedAt)
+                .HasDefaultValueSql("SYSDATETIME()");
+
+            entity.HasOne(x => x.User)
+                .WithMany(x => x.Budgets)
+                .HasForeignKey(x => x.UserId);
+
+            entity.HasOne(x => x.Category)
+                .WithMany(x => x.Budgets)
+                .HasForeignKey(x => x.CategoryId);
+
+            entity.HasIndex(x => new
+            {
+                x.UserId,
+                x.CategoryId,
+                x.Month,
+                x.Year
+            })
+            .IsUnique();
         });
 
     }
