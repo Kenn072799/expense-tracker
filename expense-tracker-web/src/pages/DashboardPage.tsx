@@ -1,33 +1,34 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import {
-  getBudgetAlerts,
-  getDashboard,
-} from "../api/dashboardApi";
+import { getBudgetAlerts, getDashboard } from "../api/dashboardApi";
 import type { DashboardResponse } from "../types/dashboard";
 import type { BudgetAlert } from "../types/budgetAlert";
 import CategoryChart from "../components/CategoryChart";
+import { getMonthlySpending } from "../api/reportApi";
+import type { MonthlySpending } from "../types/report";
+import MonthlySpendingChart from "../components/MonthlySpendingChart";
 
 export default function DashboardPage() {
-  const [dashboard, setDashboard] =
-    useState<DashboardResponse | null>(null);
+  const [dashboard, setDashboard] = useState<DashboardResponse | null>(null);
 
-  const [budgetAlerts, setBudgetAlerts] =
-    useState<BudgetAlert[]>([]);
+  const [budgetAlerts, setBudgetAlerts] = useState<BudgetAlert[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const [monthlySpending, setMonthlySpending] = useState<MonthlySpending[]>([]);
+
+  const [reportMonths, setReportMonths] = useState(6);
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadDashboard() {
       try {
-        const [dashboardResult, budgetAlertsResult] =
-          await Promise.all([
-            getDashboard(),
-            getBudgetAlerts(),
-          ]);
+        const [dashboardResult, budgetAlertsResult] = await Promise.all([
+          getDashboard(),
+          getBudgetAlerts(),
+        ]);
 
         if (!cancelled) {
           setDashboard(dashboardResult);
@@ -51,15 +52,37 @@ export default function DashboardPage() {
     };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadMonthlySpending() {
+      try {
+        const result = await getMonthlySpending(reportMonths);
+
+        if (!cancelled) {
+          setMonthlySpending(result);
+        }
+      } catch {
+        if (!cancelled) {
+          setMonthlySpending([]);
+        }
+      }
+    }
+
+    loadMonthlySpending();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [reportMonths]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navbar />
 
         <div className="flex items-center justify-center py-20">
-          <p className="text-sm text-gray-500">
-            Loading dashboard...
-          </p>
+          <p className="text-sm text-gray-500">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -89,9 +112,7 @@ export default function DashboardPage() {
         <div className="mx-auto max-w-6xl">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Dashboard
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
 
             <p className="mt-1 text-sm text-gray-500">
               Overview of your expenses and monthly budgets.
@@ -115,26 +136,19 @@ export default function DashboardPage() {
             </div>
 
             <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
-              <p className="text-sm font-medium text-gray-500">
-                This Month
-              </p>
+              <p className="text-sm font-medium text-gray-500">This Month</p>
 
               <p className="mt-2 text-2xl font-bold text-gray-900">
                 ₱
-                {dashboard.thisMonthExpenses.toLocaleString(
-                  undefined,
-                  {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  },
-                )}
+                {dashboard.thisMonthExpenses.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </p>
             </div>
 
             <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
-              <p className="text-sm font-medium text-gray-500">
-                Transactions
-              </p>
+              <p className="text-sm font-medium text-gray-500">Transactions</p>
 
               <p className="mt-2 text-2xl font-bold text-gray-900">
                 {dashboard.totalTransactions}
@@ -169,10 +183,7 @@ export default function DashboardPage() {
                   );
 
                   return (
-                    <div
-                      key={alert.budgetId}
-                      className="px-6 py-5"
-                    >
+                    <div key={alert.budgetId} className="px-6 py-5">
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <h3 className="font-semibold text-gray-900">
@@ -181,21 +192,15 @@ export default function DashboardPage() {
 
                           <p className="mt-1 text-sm text-gray-500">
                             ₱
-                            {alert.spentAmount.toLocaleString(
-                              undefined,
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              },
-                            )}{" "}
+                            {alert.spentAmount.toLocaleString(undefined, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}{" "}
                             of ₱
-                            {alert.budgetAmount.toLocaleString(
-                              undefined,
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              },
-                            )}
+                            {alert.budgetAmount.toLocaleString(undefined, {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}
                           </p>
                         </div>
 
@@ -228,9 +233,7 @@ export default function DashboardPage() {
                       </div>
 
                       <div className="mt-2 flex flex-wrap justify-between gap-2 text-xs text-gray-500">
-                        <span>
-                          {alert.progressPercentage.toFixed(1)}% used
-                        </span>
+                        <span>{alert.progressPercentage.toFixed(1)}% used</span>
 
                         <span
                           className={
@@ -240,25 +243,23 @@ export default function DashboardPage() {
                           }
                         >
                           Remaining: ₱
-                          {alert.remainingAmount.toLocaleString(
-                            undefined,
-                            {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            },
-                          )}
+                          {alert.remainingAmount.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
                         </span>
                       </div>
 
                       {alert.status === "Over Budget" && (
                         <p className="mt-3 text-sm font-medium text-red-600">
                           You are over budget by ₱
-                          {Math.abs(
-                            alert.remainingAmount,
-                          ).toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}
+                          {Math.abs(alert.remainingAmount).toLocaleString(
+                            undefined,
+                            {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            },
+                          )}
                           .
                         </p>
                       )}
@@ -275,6 +276,36 @@ export default function DashboardPage() {
             )}
           </div>
 
+          {/* Monthly Spending Trends */}
+          <div className="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
+            <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Monthly Spending Trends
+                </h2>
+
+                <p className="mt-1 text-sm text-gray-500">
+                  Compare your spending across recent months.
+                </p>
+              </div>
+
+              <select
+                value={reportMonths}
+                onChange={(e) => setReportMonths(Number(e.target.value))}
+                className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              >
+                <option value={3}>Last 3 months</option>
+                <option value={6}>Last 6 months</option>
+                <option value={12}>Last 12 months</option>
+              </select>
+            </div>
+
+            <MonthlySpendingChart
+              data={monthlySpending}
+              months={reportMonths}
+            />
+          </div>
+
           {/* Spending Overview */}
           <div className="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
             <div className="mb-6">
@@ -287,9 +318,7 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <CategoryChart
-              data={dashboard.categoryBreakdown}
-            />
+            <CategoryChart data={dashboard.categoryBreakdown} />
           </div>
 
           {/* Category Breakdown */}
@@ -306,35 +335,28 @@ export default function DashboardPage() {
 
             {dashboard.categoryBreakdown.length === 0 ? (
               <div className="px-6 py-10 text-center">
-                <p className="text-sm text-gray-500">
-                  No expense data yet.
-                </p>
+                <p className="text-sm text-gray-500">No expense data yet.</p>
               </div>
             ) : (
               <div className="divide-y divide-gray-100">
-                {dashboard.categoryBreakdown.map(
-                  (category) => (
-                    <div
-                      key={category.categoryId}
-                      className="flex items-center justify-between px-6 py-4"
-                    >
-                      <span className="text-sm font-medium text-gray-700">
-                        {category.categoryName}
-                      </span>
+                {dashboard.categoryBreakdown.map((category) => (
+                  <div
+                    key={category.categoryId}
+                    className="flex items-center justify-between px-6 py-4"
+                  >
+                    <span className="text-sm font-medium text-gray-700">
+                      {category.categoryName}
+                    </span>
 
-                      <span className="text-sm font-semibold text-gray-900">
-                        ₱
-                        {category.totalAmount.toLocaleString(
-                          undefined,
-                          {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          },
-                        )}
-                      </span>
-                    </div>
-                  ),
-                )}
+                    <span className="text-sm font-semibold text-gray-900">
+                      ₱
+                      {category.totalAmount.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </span>
+                  </div>
+                ))}
               </div>
             )}
           </div>

@@ -1,4 +1,5 @@
 ﻿using ExpenseTracker.Application.DTOs.Expenses;
+using ExpenseTracker.Application.DTOs.Reports;
 using ExpenseTracker.Application.Interfaces.Repositories;
 using ExpenseTracker.Domain.Entities;
 using ExpenseTracker.Infrastructure.Data;
@@ -164,6 +165,40 @@ public class ExpenseRepository : IExpenseRepository
                 e.UserId == userId &&
                 e.ExpenseDate.Year == year &&
                 e.ExpenseDate.Month == month)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<MonthlySpendingResponse>> GetMonthlySpendingAsync(
+        int userId,
+        int months)
+    {
+        var startDate = DateTime.UtcNow
+            .AddMonths(-(months - 1));
+
+        startDate = new DateTime(
+            startDate.Year,
+            startDate.Month,
+            1);
+
+        return await _context.Expenses
+            .Where(e =>
+                e.UserId == userId &&
+                e.ExpenseDate >= startDate)
+            .GroupBy(e => new
+            {
+                e.ExpenseDate.Year,
+                e.ExpenseDate.Month
+            })
+            .Select(group => new MonthlySpendingResponse
+            {
+                Year = group.Key.Year,
+                Month = group.Key.Month,
+                TotalSpent = group.Sum(e => e.Amount),
+                TransactionCount = group.Count()
+            })
+            .OrderBy(x => x.Year)
+            .ThenBy(x => x.Month)
             .AsNoTracking()
             .ToListAsync();
     }
