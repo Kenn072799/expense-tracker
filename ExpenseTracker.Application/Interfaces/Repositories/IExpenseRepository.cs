@@ -1,4 +1,5 @@
 ﻿using ExpenseTracker.Application.DTOs.Expenses;
+using ExpenseTracker.Application.DTOs.Reports;
 using ExpenseTracker.Domain.Entities;
 
 namespace ExpenseTracker.Application.Interfaces.Repositories;
@@ -27,4 +28,8 @@ public interface IExpenseRepository
         int userId,
         int month,
         int year);
+
+    Task<IEnumerable<MonthlySpendingResponse>> GetMonthlySpendingAsync(
+        int userId,
+        int months);
 }
