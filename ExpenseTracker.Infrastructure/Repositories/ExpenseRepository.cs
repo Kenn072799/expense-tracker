@@ -153,4 +153,18 @@ public class ExpenseRepository : IExpenseRepository
             .AsNoTracking()
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<Expense>> GetByMonthAsync(
+        int userId,
+        int month,
+        int year)
+    {
+        return await _context.Expenses
+            .Where(e => 
+                e.UserId == userId &&
+                e.ExpenseDate.Year == year &&
+                e.ExpenseDate.Month == month)
+            .AsNoTracking()
+            .ToListAsync();
+    }
 }
