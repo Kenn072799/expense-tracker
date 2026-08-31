@@ -4,6 +4,7 @@ import RegisterPage from "./pages/RegisterPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
 import ExpensesPage from "./pages/ExpensesPage";
+import BudgetsPage from "./pages/BudgetsPage";
 
 function App() {
   return (
@@ -27,6 +28,14 @@ function App() {
         element={
           <ProtectedRoute>
             <ExpensesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/budgets"
+        element={
+          <ProtectedRoute>
+            <BudgetsPage />
           </ProtectedRoute>
         }
       />
