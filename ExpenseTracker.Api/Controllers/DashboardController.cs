@@ -24,19 +24,48 @@ namespace ExpenseTracker.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<DashboardResponse>> GetDashboard()
         {
-            var userIdCliam = User.FindFirst(
-                ClaimTypes.NameIdentifier
-                )?.Value;
+            var userId = GetUserId();
 
-            if(!int.TryParse( userIdCliam, out var userId))
+            if (userId is null)
             {
                 return Unauthorized();
             }
 
-            var dashboard = 
-                await _dashboardService.GetDashboardAsync(userId);
+
+            var dashboard =
+                await _dashboardService.GetDashboardAsync(userId.Value);
 
             return Ok(dashboard);
         }
+
+        [HttpGet("budget-alerts")]
+        public async Task<ActionResult<IEnumerable<BudgetAlertResponse>>> GetBudgetAlerts()
+        {
+            var userId = GetUserId();
+
+            if (userId is null)
+            {
+                return Unauthorized();
+            }
+
+            var alerts = await _dashboardService.GetBudgetAlertsAsync(userId.Value);
+
+            return Ok(alerts);
+        }
+
+        private int? GetUserId()
+        {
+            var userIdClaim =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!int.TryParse(userIdClaim, out var userId))
+            {
+                return null;
+            }
+
+            return userId;
+        }
     }
+
+
 }
