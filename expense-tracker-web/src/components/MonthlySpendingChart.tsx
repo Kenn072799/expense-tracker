@@ -8,10 +8,10 @@ import {
   YAxis,
 } from "recharts";
 
-import type { MonthlySpending } from "../types/report";
+import type { MonthlySpendingResponse } from "../types/report";
 
 interface MonthlySpendingChartProps {
-  data: MonthlySpending[];
+  data: MonthlySpendingResponse[];
   months: number;
 }
 

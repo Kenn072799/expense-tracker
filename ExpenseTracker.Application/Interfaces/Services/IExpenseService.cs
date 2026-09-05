@@ -25,4 +25,8 @@ public interface IExpenseService
     Task<bool> DeleteAsync(
         int userId,
         int expenseId);
+
+    Task<IEnumerable<ExpenseResponse>> GetRecentAsync(
+    int userId,
+    int limit);
 }

@@ -12,6 +12,8 @@ public class ExpenseFilterRequest
 
     public DateTime? EndDate { get; set; }
 
+    public string? Search { get; set; }
+
     public string SortBy { get; set; } = "expenseDate";
 
     public string SortDirection { get; set; } = "desc";

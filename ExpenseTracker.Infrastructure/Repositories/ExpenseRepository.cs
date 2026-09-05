@@ -43,6 +43,15 @@ public class ExpenseRepository : IExpenseRepository
                 e.CategoryId == filter.CategoryId.Value);
         }
 
+        if (!string.IsNullOrWhiteSpace(filter.Search))
+        {
+            var search = filter.Search.Trim();
+
+            query = query.Where(e =>
+                e.Description != null &&
+                e.Description.Contains(search));
+        }
+
         if (filter.StartDate.HasValue)
         {
             query = query.Where(e =>
@@ -51,8 +60,11 @@ public class ExpenseRepository : IExpenseRepository
 
         if (filter.EndDate.HasValue)
         {
+            var endDateExclusive =
+                filter.EndDate.Value.Date.AddDays(1);
+
             query = query.Where(e =>
-                e.ExpenseDate <= filter.EndDate.Value);
+                e.ExpenseDate < endDateExclusive);
         }
 
         var descending =
@@ -126,6 +138,15 @@ public class ExpenseRepository : IExpenseRepository
         {
             query = query.Where(e =>
                 e.CategoryId == filter.CategoryId.Value);
+        }
+
+        if (!string.IsNullOrWhiteSpace(filter.Search))
+        {
+            var search = filter.Search.Trim();
+
+            query = query.Where(e =>
+                e.Description != null &&
+                e.Description.Contains(search));
         }
 
         if (filter.StartDate.HasValue)
@@ -210,5 +231,46 @@ public class ExpenseRepository : IExpenseRepository
         return await _context.Expenses.AnyAsync(e =>
             e.RecurringExpenseId == recurringExpenseId &&
             e.RecurringOccurrenceDate == occurrenceDate);
+    }
+
+    public async Task<IEnumerable<CategorySpendingResponse>> GetCategorySpendingAsync(
+    int userId,
+    int month,
+    int year)
+    {
+        return await _context.Expenses
+            .AsNoTracking()
+            .Where(e =>
+                e.UserId == userId &&
+                e.ExpenseDate.Month == month &&
+                e.ExpenseDate.Year == year)
+            .GroupBy(e => new
+            {
+                e.CategoryId,
+                e.Category.Name
+            })
+            .Select(group => new CategorySpendingResponse
+            {
+                CategoryId = group.Key.CategoryId,
+                CategoryName = group.Key.Name,
+                TotalSpent = group.Sum(e => e.Amount),
+                TransactionCount = group.Count()
+            })
+            .OrderByDescending(x => x.TotalSpent)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Expense>> GetRecentAsync(
+    int userId,
+    int limit)
+    {
+        return await _context.Expenses
+            .Include(e => e.Category)
+            .Where(e => e.UserId == userId)
+            .OrderByDescending(e => e.ExpenseDate)
+            .ThenByDescending(e => e.CreatedAt)
+            .Take(limit)
+            .AsNoTracking()
+            .ToListAsync();
     }
 }
