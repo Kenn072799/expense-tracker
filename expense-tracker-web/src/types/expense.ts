@@ -29,6 +29,7 @@ export interface ExpenseFilterRequest {
     categoryId?: number;
     startDate?: string;
     endDate?: string;
+    search?: string;
     sortBy?: string;
     sortDirection: "asc" | "desc";
 }

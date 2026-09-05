@@ -36,4 +36,14 @@ public interface IExpenseRepository
     Task<bool> RecurringOccurrenceExistsAsync(
     int recurringExpenseId,
     DateTime occurrenceDate);
+
+    Task<IEnumerable<CategorySpendingResponse>> GetCategorySpendingAsync(
+    int userId,
+    int month,
+    int year);
+
+    Task<IEnumerable<Expense>> GetRecentAsync(
+    int userId,
+    int limit);
+
 }

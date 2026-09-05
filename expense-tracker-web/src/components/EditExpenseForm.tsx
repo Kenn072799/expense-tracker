@@ -1,11 +1,17 @@
 import { useState } from "react";
 import type { CategoryResponse } from "../types/category";
-import type { ExpenseResponse, UpdateExpenseRequest } from "../types/expense";
+import type {
+  ExpenseResponse,
+  UpdateExpenseRequest,
+} from "../types/expense";
 
 interface EditExpenseFormProps {
   expense: ExpenseResponse;
   categories: CategoryResponse[];
-  onSubmit: (expenseId: number, request: UpdateExpenseRequest) => Promise<void>;
+  onSubmit: (
+    expenseId: number,
+    request: UpdateExpenseRequest,
+  ) => Promise<void>;
   onCancel: () => void;
 }
 
@@ -15,21 +21,52 @@ export default function EditExpenseForm({
   onSubmit,
   onCancel,
 }: EditExpenseFormProps) {
-  const [categoryId, setCategoryId] = useState(expense.categoryId.toString());
+  const originalCategoryId = expense.categoryId.toString();
+  const originalAmount = expense.amount.toString();
+  const originalDescription = expense.description ?? "";
+  const originalExpenseDate =
+    expense.expenseDate.split("T")[0];
 
-  const [amount, setAmount] = useState(expense.amount.toString());
+  const [categoryId, setCategoryId] =
+    useState(originalCategoryId);
 
-  const [description, setDescription] = useState(expense.description ?? "");
+  const [amount, setAmount] =
+    useState(originalAmount);
 
-  const [expenseDate, setExpenseDate] = useState(
-    expense.expenseDate.split("T")[0],
-  );
+  const [description, setDescription] =
+    useState(originalDescription);
+
+  const [expenseDate, setExpenseDate] =
+    useState(originalExpenseDate);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  const hasChanges =
+    categoryId !== originalCategoryId ||
+    Number(amount) !== Number(originalAmount) ||
+    description !== originalDescription ||
+    expenseDate !== originalExpenseDate;
+
+  const isValid =
+    categoryId !== "" &&
+    amount !== "" &&
+    Number(amount) > 0 &&
+    expenseDate !== "";
+
+  const canSubmit =
+    hasChanges &&
+    isValid &&
+    !loading;
+
+  async function handleSubmit(
+    event: React.FormEvent<HTMLFormElement>,
+  ) {
     event.preventDefault();
+
+    if (!canSubmit) {
+      return;
+    }
 
     setError("");
 
@@ -51,14 +88,18 @@ export default function EditExpenseForm({
     const request: UpdateExpenseRequest = {
       categoryId: Number(categoryId),
       amount: Number(amount),
-      description: description || undefined,
+      description:
+        description.trim() || undefined,
       expenseDate,
     };
 
     try {
       setLoading(true);
 
-      await onSubmit(expense.expenseId, request);
+      await onSubmit(
+        expense.expenseId,
+        request,
+      );
     } catch {
       setError("Failed to update expense.");
     } finally {
@@ -69,14 +110,16 @@ export default function EditExpenseForm({
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-5">
-        <h2 className="text-lg font-semibold text-gray-900">Edit Expense</h2>
+        <h2 className="text-lg font-semibold text-gray-900">
+          Edit Expense
+        </h2>
 
         <p className="mt-1 text-sm text-gray-500">
           Update the selected expense.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2">
         {/* Category */}
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">
@@ -85,11 +128,17 @@ export default function EditExpenseForm({
 
           <select
             value={categoryId}
-            onChange={(event) => setCategoryId(event.target.value)}
-            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            onChange={(event) =>
+              setCategoryId(event.target.value)
+            }
+            disabled={loading}
+            className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-gray-100"
           >
             {categories.map((category) => (
-              <option key={category.categoryId} value={category.categoryId}>
+              <option
+                key={category.categoryId}
+                value={category.categoryId}
+              >
                 {category.name}
               </option>
             ))}
@@ -107,8 +156,11 @@ export default function EditExpenseForm({
             min="0.01"
             step="0.01"
             value={amount}
-            onChange={(event) => setAmount(event.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            disabled={loading}
+            onChange={(event) =>
+              setAmount(event.target.value)
+            }
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-gray-100"
           />
         </div>
 
@@ -121,8 +173,11 @@ export default function EditExpenseForm({
           <input
             type="date"
             value={expenseDate}
-            onChange={(event) => setExpenseDate(event.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            disabled={loading}
+            onChange={(event) =>
+              setExpenseDate(event.target.value)
+            }
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-gray-100"
           />
         </div>
 
@@ -135,19 +190,24 @@ export default function EditExpenseForm({
           <input
             type="text"
             value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            disabled={loading}
+            onChange={(event) =>
+              setDescription(event.target.value)
+            }
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-gray-100"
           />
         </div>
       </div>
 
       {error && (
         <div className="mt-4 rounded-lg bg-red-50 px-4 py-3">
-          <p className="text-sm text-red-600">{error}</p>
+          <p className="text-sm text-red-600">
+            {error}
+          </p>
         </div>
       )}
 
-      <div className="mt-5 flex justify-end gap-3">
+      <div className="mt-6 flex justify-end gap-3">
         <button
           type="button"
           onClick={onCancel}
@@ -159,10 +219,12 @@ export default function EditExpenseForm({
 
         <button
           type="submit"
-          disabled={loading}
-          className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={!canSubmit}
+          className="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
         >
-          {loading ? "Saving..." : "Save Changes"}
+          {loading
+            ? "Saving..."
+            : "Save Changes"}
         </button>
       </div>
     </form>

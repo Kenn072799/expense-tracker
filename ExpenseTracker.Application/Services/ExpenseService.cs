@@ -164,4 +164,26 @@ public class ExpenseService : IExpenseService
             UpdatedAt = expense.UpdatedAt
         };
     }
+
+    public async Task<IEnumerable<ExpenseResponse>> GetRecentAsync(
+    int userId,
+    int limit)
+    {
+        if (limit < 1)
+        {
+            limit = 5;
+        }
+
+        if (limit > 20)
+        {
+            limit = 20;
+        }
+
+        var expenses =
+            await _expenseRepository.GetRecentAsync(
+                userId,
+                limit);
+
+        return expenses.Select(MapToResponse);
+    }
 }

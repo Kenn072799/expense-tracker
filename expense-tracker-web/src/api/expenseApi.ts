@@ -53,3 +53,17 @@ export async function updateExpense(
 export async function deleteExpense(expenseId: number): Promise<void> {
   await apiClient.delete(`/expenses/${expenseId}`);
 }
+
+export async function getRecentExpenses(
+  limit = 5,
+): Promise<ExpenseResponse[]> {
+  const response = await apiClient.get<
+    ExpenseResponse[]
+  >("/expenses/recent", {
+    params: {
+      limit,
+    },
+  });
+
+  return response.data;
+}

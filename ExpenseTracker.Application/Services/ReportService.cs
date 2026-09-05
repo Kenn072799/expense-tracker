@@ -33,4 +33,25 @@ public class ReportService : IReportService
             userId,
             months);
     }
+
+    public async Task<IEnumerable<CategorySpendingResponse>> GetCategorySpendingAsync(
+    int userId,
+    int month,
+    int year)
+    {
+        if (month < 1 || month > 12)
+        {
+            throw new ArgumentException("Month must be between 1 and 12.");
+        }
+
+        if (year <= 0)
+        {
+            throw new ArgumentException("Year must be valid.");
+        }
+
+        return await _expenseRepository.GetCategorySpendingAsync(
+            userId,
+            month,
+            year);
+    }
 }

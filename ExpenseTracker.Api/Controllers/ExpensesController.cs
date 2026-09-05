@@ -40,7 +40,7 @@ namespace ExpenseTracker.Api.Controllers
         {
             var userId = GetCurrentUserId();
 
-            var result = 
+            var result =
                 await _expenseService.CreateAsync(userId, request);
 
             return Ok(result);
@@ -68,7 +68,7 @@ namespace ExpenseTracker.Api.Controllers
             var result =
                 await _expenseService.GetByIdAsync(userId, id);
 
-            if(result == null)
+            if (result == null)
             {
                 return NotFound();
             }
@@ -89,7 +89,7 @@ namespace ExpenseTracker.Api.Controllers
                     id,
                     request);
 
-            if(result == null)
+            if (result == null)
             {
                 return NotFound();
             }
@@ -105,12 +105,26 @@ namespace ExpenseTracker.Api.Controllers
             var deleted =
                 await _expenseService.DeleteAsync(userId, id);
 
-            if(!deleted)
+            if (!deleted)
             {
                 return NotFound();
             }
 
             return NoContent();
+        }
+
+        [HttpGet("recent")]
+        public async Task<IActionResult> GetRecent(
+            [FromQuery] int limit = 5)
+        {
+            var userId = GetCurrentUserId();
+
+            var result =
+                await _expenseService.GetRecentAsync(
+                    userId,
+                    limit);
+
+            return Ok(result);
         }
     }
 }

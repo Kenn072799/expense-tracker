@@ -38,6 +38,26 @@ public class ReportsController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("category-spending")]
+    public async Task<ActionResult<IEnumerable<CategorySpendingResponse>>> GetCategorySpending(
+    [FromQuery] int month,
+    [FromQuery] int year)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (!int.TryParse(userIdClaim, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        var result = await _reportService.GetCategorySpendingAsync(
+            userId,
+            month,
+            year);
+
+        return Ok(result);
+    }
+
     private int? GetUserId()
     {
         var userIdClaim =
