@@ -9,4 +9,5 @@ export interface DashboardResponse {
     thisMonthExpenses: number;
     totalTransactions: number;
     categoryBreakdown: CategoryExpenseResponse[];
+    firstName: string;
 }
