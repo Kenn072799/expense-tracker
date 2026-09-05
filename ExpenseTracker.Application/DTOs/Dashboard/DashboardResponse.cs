@@ -9,4 +9,6 @@ public class DashboardResponse
     public int TotalTransactions { get; set; }
 
     public List<CategoryExpenseResponse> CategoryBreakdown { get; set; } = new();
+
+    public string FirstName { get; set; } = string.Empty;
 }

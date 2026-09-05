@@ -36,4 +36,10 @@ public class UserRepository : IUserRepository
 
         return user;
     }
+    public async Task<User?> GetByIdAsync(int userId)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(x => x.UserId == userId);
+        return user;
+    }
 }
