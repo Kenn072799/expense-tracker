@@ -1,3 +1,4 @@
+using ExpenseTracker.Api.BackgroundServices;
 using ExpenseTracker.Api.Middleware;
 using ExpenseTracker.Application.Interfaces.Repositories;
 using ExpenseTracker.Application.Interfaces.Services;
@@ -38,6 +39,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IBudgetRepository, BudgetRepository>();
+builder.Services.AddScoped<IRecurringExpenseRepository, RecurringExpenseRepository>();
 
 
 // ==============================
@@ -49,6 +51,12 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IRecurringExpenseService, RecurringExpenseService>();
+
+// ==============================
+// Background Services
+// ==============================
+builder.Services.AddHostedService<RecurringExpenseBackgroundService>();
 
 
 // ==============================

@@ -34,6 +34,9 @@ export default function Navbar() {
             <NavLink to="/budgets" className={linkClass}>
               Budgets
             </NavLink>
+            <NavLink to="/recurring-expenses" className={linkClass}>
+              Recurring
+            </NavLink>
           </nav>
         </div>
 

@@ -5,6 +5,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import DashboardPage from "./pages/DashboardPage";
 import ExpensesPage from "./pages/ExpensesPage";
 import BudgetsPage from "./pages/BudgetsPage";
+import RecurringExpensesPage from "./pages/RecurringExpensesPage";
 
 function App() {
   return (
@@ -14,6 +15,15 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
 
       <Route path="/register" element={<RegisterPage />} />
+
+      <Route
+        path="/recurring-expenses"
+        element={
+          <ProtectedRoute>
+            <RecurringExpensesPage />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/dashboard"
