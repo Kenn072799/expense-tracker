@@ -20,4 +20,7 @@ public class User
 
     public ICollection<Budget> Budgets { get; set; } 
         = new List<Budget>();
+
+    public ICollection<RecurringExpense> RecurringExpenses { get; set; }
+        = new List<RecurringExpense>();
 }

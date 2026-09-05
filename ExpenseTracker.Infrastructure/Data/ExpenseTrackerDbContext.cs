@@ -13,6 +13,7 @@ public class ExpenseTrackerDbContext : DbContext
     public DbSet<Expense> Expenses { get; set; }
     public DbSet<Category> Categories { get; set; }
     public DbSet<Budget> Budgets { get; set; }
+    public DbSet<RecurringExpense> RecurringExpenses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -93,6 +94,19 @@ public class ExpenseTrackerDbContext : DbContext
             entity.HasOne(x => x.Category)
                 .WithMany(x => x.Expenses)
                 .HasForeignKey(x => x.CategoryId);
+
+            entity.HasOne(x => x.RecurringExpense)
+                .WithMany()
+                .HasForeignKey(x => x.RecurringExpenseId);
+
+            entity.HasIndex(x => new
+            {
+                x.RecurringExpenseId,
+                x.RecurringOccurrenceDate
+            })
+            .IsUnique()
+            .HasFilter(
+                "[RecurringExpenseId] IS NOT NULL AND [RecurringOccurrenceDate] IS NOT NULL");
         });
 
         modelBuilder.Entity<Budget>(entity =>
@@ -126,6 +140,47 @@ public class ExpenseTrackerDbContext : DbContext
                 x.Year
             })
             .IsUnique();
+        });
+
+        modelBuilder.Entity<RecurringExpense>(entity =>
+        {
+            entity.ToTable("RecurringExpense");
+
+            entity.HasKey(x => x.RecurringExpenseId);
+
+            entity.Property(x => x.Amount)
+                .HasColumnType("decimal(18,2)")
+                .IsRequired();
+
+            entity.Property(x => x.Description)
+                .HasMaxLength(255);
+
+            entity.Property(x => x.Frequency)
+                .HasMaxLength(20)
+                .IsRequired();
+
+            entity.Property(x => x.StartDate)
+                .IsRequired();
+
+            entity.Property(x => x.NextRunDate)
+                .IsRequired();
+
+            entity.Property(x => x.IsActive)
+                .HasDefaultValue(true);
+
+            entity.Property(x => x.CreatedAt)
+                .HasDefaultValueSql("SYSDATETIME()");
+
+            entity.Property(x => x.UpdatedAt)
+                .HasDefaultValueSql("SYSDATETIME()");
+
+            entity.HasOne(x => x.User)
+                .WithMany(x => x.RecurringExpenses)
+                .HasForeignKey(x => x.UserId);
+
+            entity.HasOne(x => x.Category)
+                .WithMany(x => x.RecurringExpenses)
+                .HasForeignKey(x => x.CategoryId);
         });
 
     }

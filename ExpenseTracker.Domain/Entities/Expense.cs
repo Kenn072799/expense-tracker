@@ -21,4 +21,10 @@ public class Expense
     public User? User { get; set; }
 
     public Category? Category { get; set; }
+
+    public int? RecurringExpenseId { get; set; }
+
+    public DateTime? RecurringOccurrenceDate { get; set; }
+
+    public RecurringExpense? RecurringExpense { get; set; }
 }

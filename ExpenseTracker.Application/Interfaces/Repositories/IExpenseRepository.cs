@@ -32,4 +32,8 @@ public interface IExpenseRepository
     Task<IEnumerable<MonthlySpendingResponse>> GetMonthlySpendingAsync(
         int userId,
         int months);
+
+    Task<bool> RecurringOccurrenceExistsAsync(
+    int recurringExpenseId,
+    DateTime occurrenceDate);
 }

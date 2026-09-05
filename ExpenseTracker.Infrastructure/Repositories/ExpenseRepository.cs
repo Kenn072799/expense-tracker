@@ -202,4 +202,13 @@ public class ExpenseRepository : IExpenseRepository
             .AsNoTracking()
             .ToListAsync();
     }
+
+    public async Task<bool> RecurringOccurrenceExistsAsync(
+    int recurringExpenseId,
+    DateTime occurrenceDate)
+    {
+        return await _context.Expenses.AnyAsync(e =>
+            e.RecurringExpenseId == recurringExpenseId &&
+            e.RecurringOccurrenceDate == occurrenceDate);
+    }
 }
